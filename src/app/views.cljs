@@ -158,20 +158,11 @@
 (defn show-item [marker [nm v :as all]]
   [:div {:key (gensym)
          :class "flex flex-row h-12 align-bottom"}
-   ;; [:div {:key (gensym)
-          ;; :class "flex-initial w-4 self-center"}
-    ;; nm]
    [:div {:key (gensym)
           :class "flex-initial inline-block w-20 self-center"}
     [text-input {:on-save #(dispatch [:change-xml-val {:marker marker
                                                        :item-name nm
                                                        :value (str %)}])
-                 ;; :on-change nil
-                 ;; #(if-not (or (nil? %) (not (= "-" %)))
-                               ;; (let [filtered (filter-only-nums %)]
-                                 ;; filtered))
-                                   ;; (-> (.toFixed (js/parseFloat filtered) fixed-sz)
-                                       ;; (rem max-limit))))
                  :props {:class "w-20 rounded-lg text-xs hover:border-rose-200"}
                  :value v
                  :key (gensym)}]]
@@ -192,13 +183,13 @@
    (let [names (-> content first second keys)]
      [:div {:class "flex flex-col justify-center gap-8"}
       [:div {:key (gensym)
-             :class "flex-intitial w-4 self-center h-3"}
+             :class "flex-intitial w-4 self-center h-3 gap-2"}
        ]
       (for [item-name names]
         [:div {:key (gensym)
                :class "flex-intitial w-4 self-center h-4"}
          item-name])])
-   [:div {:class "flex overflow-scroll"}
+   [:div {:class "flex overflow-auto"}
     (for [[group-name item] content]
       [:div {:class "flex flex-col "
              :key (gensym)}
@@ -215,16 +206,32 @@
                                (.catch #(js/alert "file open error: " %)))))}
     "open"]])
 
+(defn filter-file-name [path]
+  (let [os (-> js/window .-navigator .-platform)]
+    (condp = os
+      "Win32" (.pop (.split path "\\"))
+      (.pop (.split path "/")))))
+
 (defn selected-file []
   (let [filename @(subscribe [:xml-file])]
     [:div {:class "flex"}
      [:p {:class "truncate px-4"}
       (if (empty? filename)
         "choose a xml file"
-        (.pop (.split filename "/")))]]))
+        (filter-file-name filename))]]))
+;;        (.pop (.split filename "/")))]]))
 
+(defn latest-save-time []
+   (let [latest-save-time @(subscribe [:latest-save-time])]
+     [:div {:class "flex"}
+      [:div 
+      (if (= latest-save-time 0)
+        (str "")
+        (str "latest save time: " latest-save-time))]]))
+ 
+  
 (defn view-root []
-  [:div {:class "flex flex-col w-auto overflow-scroll"
+  [:div {:class "flex flex-col w-auto "
          :key :main-div}
    [:> ToastContainer (clj->js {:position "bottom-right"
                                 :autoClose 1000
@@ -235,12 +242,14 @@
                                 :pauseOnFocusLoss false
                                 :draggable true
                                 :pauseOnHover true})]
-   [:div {:class "flex flex-row justify-center items-center py-8 px-4 pa overflow-scroll "}
+   [:div {:class "flex justify-center"}
+    (latest-save-time)]
+   [:div {:class "flex flex-row justify-center items-center py-8 px-4 pa"}
     (open-file)
     (ui-slider)]
    [:div {:class "flex justify-center items-center text-blue-400 mb-4"}
     (selected-file)]
    (let [contents @(subscribe [:xml-content])]
-     (show-xml-content contents))]
-   )
+     (show-xml-content contents))])
+  
 

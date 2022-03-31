@@ -1,5 +1,5 @@
 {
-    "name": "cljs-tauri",
+    "name": "xml-editor",
     "scripts": {
         "tauri": "tauri",
         "shadow:watch": "shadow-cljs watch app",

@@ -30,11 +30,15 @@
                     (str group-name "\r\n" (make-content-format-group items) "\r\n"))]
     (apply str group-str)))
 
+(defn cur-time []
+  (let [date (new js/Date)]
+    (str (.getHours date) ":" (.getMinutes date) ":" (.getSeconds date))))
            
 (defn save-file [path content]
   (debug "save file" content)
   (-> (.writeFile fs (clj->js {:path path :contents (make-content-format content)}))
-      (.then #(funcs/toast "saved file"))
+      ;; (.then #(funcs/toast "saved file"))
+      (.then (dispatch [:latest-save-time (cur-time)]))
       (.catch #(prn "save-file errro: " %))))
 
 

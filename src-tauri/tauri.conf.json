@@ -1,6 +1,6 @@
 {
   "package": {
-    "productName": "cljs-tauri",
+    "productName": "xml-editor",
     "version": "0.1.0"
   },
   "build": {
@@ -60,7 +60,7 @@
             "writeFile": true
         },
         "notification": {
-            "all": true,
+            "all": true
         },
     },
     "windows": [{

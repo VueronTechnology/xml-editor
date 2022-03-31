@@ -75,3 +75,8 @@
          new-db (assoc-in db [:xml-content g-marker item-name] new-v)]
      (xml/save-file (get-xml-path new-db) (get-xml-content new-db))
      new-db)))
+
+(reg-event-db
+ :latest-save-time
+ (fn [db [_ v]]
+   (assoc-in db [:latest-save-time] v)))

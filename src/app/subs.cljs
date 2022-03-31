@@ -54,3 +54,7 @@
  (fn [db _]
    (get db :xml-content)))
 
+(reg-sub
+ :latest-save-time
+ (fn [db _]
+   (get db :latest-save-time)))
