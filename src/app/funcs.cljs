@@ -3,7 +3,7 @@
             ["react-toastify" :as rt])) ;; :refer [toast ToastContainer]]))
 
 (defn toast [msg]
-  (rt/toast msg (clj->js {:position "bottom-right"
+  (.success rt/toast msg (clj->js {:position "bottom-right"
                  :autoClose 200
                  :hideProgressBar false
                  :closeOnClick true

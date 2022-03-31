@@ -4,7 +4,7 @@
 
 (def default-db
   {:calibration {}
-   :unit-steps 5
-   :slider-val 1
+   :unit-steps 4
+   :slider-val 2
    :connection-status "not connected"
    :unit-number 1})

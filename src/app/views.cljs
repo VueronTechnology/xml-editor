@@ -16,7 +16,8 @@
 (defn remove-start-0 [v]
   (if (and (> (count v) 1)
            (.startsWith v "0"))
-    (.substring v 1)
+    (do (debug (.substring v 1))
+      (.substring v 1))
     v))
 
 (defn avoid-empty [v]
@@ -27,21 +28,58 @@
     0))
 
 (defn number-negative-filter [v]
-  (let [[_ v] (re-find #"(^\-?[0-9]+\.?[0-9]*)" v)]
-       (prn "VVV " v)
-       v))
+  (if (= v "-")
+    v
+    (let [[_ v] (re-find #"(^\-?[0-9]+\.?[0-9]*)" v)]
+      (prn "VVV " v)
+      v)))
 
+(defn filter-only-nums [v]
+  (debug "in filter-only-nums input:" v)
+  (if (= v "0-")
+    v
+    (let [refined-v (-> v
+                        str
+                        clojure.string/trim
+                        number-negative-filter)]
+      (debug "refined " refined-v)
+      refined-v)))
 
-(defn filter-input-nums [v]
-  (prn "in filter " v)
-  (let [refined-v (-> v
-                      clojure.string/trim
-                      number-negative-filter
-                      ;; remove-start-0
-                      ;; avoid-empty
-                      )]
-    (prn "refined " refined-v)
-    refined-v))
+(defn onchange-fixed-sz [v]
+  (let [exponent-sz 3
+        fraction-sz 2
+        new-v (js/parseFloat v)]
+    (debug "v: " v  " new v " new-v)
+    (cond
+      (= "-" v) v
+      (= "" v) v
+      (nil? v) v
+      (.endsWith v ".") v
+      :else (-> (.toFixed new-v fraction-sz)
+                (rem (.pow js/Math 10 exponent-sz))))))
+
+(defn fill-after-dot [v]
+  (debug (.endsWith v "."))
+  (if (.endsWith v ".")
+    (do
+      (debug (str v "0"))
+      (str v "0"))
+    v))
+
+(defn input-filter [v]
+  (-> v
+      filter-only-nums
+      ;; fill-after-dot
+      ;; remove-start-0
+      onchange-fixed-sz
+      ))
+
+(defn onblur-fixed-sz [v]
+  (debug "on blur val: " v)
+  (cond
+    (= "" v) 0
+    (.endsWith v ".") (str v "0")
+    :else v))
 
 
 (defn text-input [{:keys [on-change props value on-save]}]
@@ -51,12 +89,13 @@
                      {
                       :type "text"
                       :value @inner-val
-                      :on-blur #(on-save (-> % .-target .-value filter-input-nums))
-                      :on-change #(let [v (-> % .-target .-value filter-input-nums)]
-                                    (debug "inner val " v)
-                                    (reset! inner-val v))
+                      :on-blur #(let [new-v  (-> % .-target .-value onblur-fixed-sz)]
+                                  (reset! inner-val new-v)
+                                  (on-save new-v))
+                      :on-change #(let [new-v (-> % .-target .-value input-filter)]
+                                   (reset! inner-val new-v))
                       :on-key-down #(case (.-which %)
-                                      13 (on-save (-> % .-target .-value filter-input-nums))
+                                      13 (on-save (-> % .-target .-value filter-only-nums))
                                       27 nil ;;esc
                                       nil)})])))
 
@@ -66,7 +105,7 @@
    [:input {:type "range"
             :class "w-100" ;;"form-range appearance-none h-6 p-0 bg-transparent focus:outline-none focus:ring-0 focus:shadow-none"
             :min "0"
-            :max "5"
+            :max "4"
             :step "1"
             :value v
             :on-change #(let [v (-> % .-target .-value)]
@@ -87,7 +126,7 @@
        (str unit)]])])
 
 (defn arrow-up [{:keys [marker nm onclick]}]
-  [:div {:class "flex-initial w-8"
+  [:div {:class "flex-initial w-8 self-center"
                :key (gensym)}
          [:button {:class "bg-grey-light hover:bg-grey items-center focus:outline-none focus:text-green-400"
                    :key (gensym)
@@ -107,7 +146,7 @@
                    :d "M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"}]]]])
 
 (defn arrow-down [{:keys [g-marker nm onclick]}]
-  [:div {:class "flex-initial w-8"
+  [:div {:class "flex-initial w-8 self-center"
          :key (gensym)}
    [:button {:class "bg-grey-light hover:bg-grey items-center"
              :key (gensym)
@@ -126,52 +165,64 @@
 
 (defn show-item [marker [nm v :as all]]
   [:div {:key (gensym)
-         :class "flex flex-row w-full h-12"}
+         :class "flex flex-row h-12 align-bottom"}
    [:div {:key (gensym)
-          :class "flex-initial w-32 justify-center items-center"}
+          :class "flex-initial w-4 self-center"}
     nm]
    [:div {:key (gensym)
-          :class "flex-initial inline-block w-20"}
+          :class "flex-initial inline-block w-20 self-center"}
     [text-input {:on-save #(dispatch [:change-xml-val {:marker marker
                                                        :item-name nm
                                                        :value (str %)}])
+                 ;; :on-change nil
+                 ;; #(if-not (or (nil? %) (not (= "-" %)))
+                               ;; (let [filtered (filter-only-nums %)]
+                                 ;; filtered))
+                                   ;; (-> (.toFixed (js/parseFloat filtered) fixed-sz)
+                                       ;; (rem max-limit))))
                  :props {:class "w-20 rounded-lg text-xs hover:border-rose-200"}
                  :value v
                  :key (gensym)}]]
-   ;; (debug "marker nm v" marker ", " nm ", " v)
    (arrow-up {:g-marker marker :nm nm :v v :onclick #(dispatch [:modify-xml-val {:g-marker marker :item-name nm :dir :inc}])})
    (arrow-down {:g-marker marker :nm nm :v v :onclick #(dispatch [:modify-xml-val {:g-marker marker :item-name nm :dir :dec}])})])
-                         
 
-(defn show-item-group [[group content]]
-  [:div {:class "flex flex-col "}
+
+(defn show-item-group [group-name content]
+  [:div {:class "flex flex-col justify-center decoration-4"}
+   [:div {:class "my-4 shadow-lg shadow-blue-100 "}
+    [:p {:class ""}
+     group-name]]
    (for [item content]
-     (show-item group item))])
+     (show-item group-name item))])
 
 (defn show-xml-content [content]
-  [:div {:class "flex flex-row gap-3 items-center"}
-   (for [group content]
-     [:div {:class "flex flex-col w-full"
-            :key (gensym)}     
-      (show-item-group group)])])
-       
+  [:div {:class "flex flex-row justify-center gap-8 overflow-scroll"}
+   (for [[group-name item] content]
+     [:div {:class "flex flex-col overflow-scroll"
+            :key (gensym)}
+      (show-item-group group-name item)])])
+
 
 (defn open-file []
-  [:div {:class "flex w-30"}
-   [:button {:class "bg-blue-500 hover:bg-blue-800 text-white font-bold rounded-full px-10 py-2"
+  [:div {:class "flex w-20"}
+   [:button {:class "bg-blue-500 hover:bg-blue-800 text-white font-bold rounded-full px-4 py-2"
              :on-click (fn [e]
                          (let [f (.open dialog (clj->js {:multiple false}))]
                            (-> f
                                (.then #(xml/read-file %))
                                (.catch #(js/alert "file open error: " %)))))}
-    "open xml"]])
+    "open"]])
 
 (defn selected-file []
   (let [filename @(subscribe [:xml-file])]
-    [:div (str "path: " filename)]))
+    [:div {:class "flex"}
+     [:p {:class "truncate px-4"}
+      (if (empty? filename)
+        "choose a xml file"
+        (.pop (.split filename "/")))]]))
 
 (defn view-root []
-  [:div {:class "flex flex-col"
+  [:div {:class "flex flex-col w-auto overflow-scroll"
          :key :main-div}
    [:> ToastContainer (clj->js {:position "bottom-right"
                                 :autoClose 1000
@@ -182,12 +233,11 @@
                                 :pauseOnFocusLoss false
                                 :draggable true
                                 :pauseOnHover true})]
-   
-   ;; [:button {:onClick #(funcs/toast "ASdf")} "asdfb"]
-   [:div {:class "flex flex-row justify-center items-center gap-3"} 
+   [:div {:class "flex flex-row justify-center items-center py-8 px-4 pa overflow-scroll "}
     (open-file)
-    (selected-file)
     (ui-slider)]
+   [:div {:class "flex justify-center text-blue-400 mb-4"}
+    (selected-file)]
    (let [contents @(subscribe [:xml-content])]
      (show-xml-content contents))]
    )

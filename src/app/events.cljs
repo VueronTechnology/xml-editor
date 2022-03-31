@@ -38,31 +38,40 @@
  (fn [db [_ v]]
    (assoc db :xml-content v)))
 
+
 (reg-event-db
  :change-xml-val
  (fn [db [_ {:keys [marker item-name value]}]]
-   (let [new-db (assoc-in db [:xml-content marker item-name] value)]
+   (let [;;new-v (rem (.toFixed (js/parseFloat value) fixed-sz) max-limit)
+         new-db (assoc-in db [:xml-content marker item-name] value)]
      (xml/save-file (get-xml-path new-db) (get-xml-content new-db))
      new-db)))
-   
+
+(defn fixed-sz [v]
+  (let [exponent-sz 3
+        fraction-sz 2
+        new-v (js/parseFloat v)]
+    (debug "new v " new-v)
+    (cond
+      (= "-" v) v
+      (= "" v) v
+      (nil? v) 0
+      :else (-> (.toFixed new-v fraction-sz)
+                (rem (.pow js/Math 10 exponent-sz))))))
+
 (reg-event-db
  :modify-xml-val
  (fn [db [_ {:keys [g-marker item-name dir] :as all}]]
    (debug "all " all)
-      (let [fixed-sz 4
-            op (condp = dir
-                 :inc +
-                 :dec -)
-            cur-v (get-cur-xml-val db g-marker item-name)
-            unit (get-unit-number db)
-            new-v (.toFixed (op (js/parseFloat cur-v)
-                                (convert-unit unit))
-                            fixed-sz)
-            new-db (assoc-in db [:xml-content g-marker item-name] new-v)]
-        ;; (debug "cur-v " cur-v)
-        ;; (debug "parser float " (js/parseFloat cur-v))
-        ;; (debug "unit #####  " unit)
-        ;; (debug "convert unit #####  " (convert-unit unit))
-        (xml/save-file (get-xml-path new-db) (get-xml-content new-db))
-        new-db)))
- 
+   (debug "op " dir )
+   (let [op (condp = dir
+              :inc +
+              :dec -)
+         cur-v (get-cur-xml-val db g-marker item-name)
+         unit (get-unit-number db)
+         new-v (-> (op (js/parseFloat cur-v)
+                       (convert-unit unit))
+                   fixed-sz)
+         new-db (assoc-in db [:xml-content g-marker item-name] new-v)]
+     (xml/save-file (get-xml-path new-db) (get-xml-content new-db))
+     new-db)))
