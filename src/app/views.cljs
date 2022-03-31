@@ -31,25 +31,21 @@
   (if (= v "-")
     v
     (let [[_ v] (re-find #"(^\-?[0-9]+\.?[0-9]*)" v)]
-      (prn "VVV " v)
       v)))
 
 (defn filter-only-nums [v]
-  (debug "in filter-only-nums input:" v)
   (if (= v "0-")
     v
     (let [refined-v (-> v
                         str
                         clojure.string/trim
                         number-negative-filter)]
-      (debug "refined " refined-v)
       refined-v)))
 
 (defn onchange-fixed-sz [v]
   (let [exponent-sz 3
         fraction-sz 2
         new-v (js/parseFloat v)]
-    (debug "v: " v  " new v " new-v)
     (cond
       (= "-" v) v
       (= "" v) v
@@ -59,18 +55,14 @@
                 (rem (.pow js/Math 10 exponent-sz))))))
 
 (defn fill-after-dot [v]
-  (debug (.endsWith v "."))
   (if (.endsWith v ".")
     (do
-      (debug (str v "0"))
       (str v "0"))
     v))
 
 (defn input-filter [v]
   (-> v
       filter-only-nums
-      ;; fill-after-dot
-      ;; remove-start-0
       onchange-fixed-sz
       ))
 
@@ -166,9 +158,9 @@
 (defn show-item [marker [nm v :as all]]
   [:div {:key (gensym)
          :class "flex flex-row h-12 align-bottom"}
-   [:div {:key (gensym)
-          :class "flex-initial w-4 self-center"}
-    nm]
+   ;; [:div {:key (gensym)
+          ;; :class "flex-initial w-4 self-center"}
+    ;; nm]
    [:div {:key (gensym)
           :class "flex-initial inline-block w-20 self-center"}
     [text-input {:on-save #(dispatch [:change-xml-val {:marker marker
@@ -196,11 +188,21 @@
      (show-item group-name item))])
 
 (defn show-xml-content [content]
-  [:div {:class "flex flex-row justify-center gap-8 overflow-scroll"}
-   (for [[group-name item] content]
-     [:div {:class "flex flex-col overflow-scroll"
-            :key (gensym)}
-      (show-item-group group-name item)])])
+  [:div {:class "flex flex-row align-top gap-4 justify-center items-center"}
+   (let [names (-> content first second keys)]
+     [:div {:class "flex flex-col justify-center gap-8"}
+      [:div {:key (gensym)
+             :class "flex-intitial w-4 self-center h-3"}
+       ]
+      (for [item-name names]
+        [:div {:key (gensym)
+               :class "flex-intitial w-4 self-center h-4"}
+         item-name])])
+   [:div {:class "flex overflow-scroll"}
+    (for [[group-name item] content]
+      [:div {:class "flex flex-col "
+             :key (gensym)}
+       (show-item-group group-name item)])]])
 
 
 (defn open-file []
@@ -236,7 +238,7 @@
    [:div {:class "flex flex-row justify-center items-center py-8 px-4 pa overflow-scroll "}
     (open-file)
     (ui-slider)]
-   [:div {:class "flex justify-center text-blue-400 mb-4"}
+   [:div {:class "flex justify-center items-center text-blue-400 mb-4"}
     (selected-file)]
    (let [contents @(subscribe [:xml-content])]
      (show-xml-content contents))]
