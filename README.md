@@ -19,9 +19,8 @@
   * calibration 항목은 한번만 출력 
   * file path를 file명만 출력
   * 화면 축소시 가로 scroll bar 추가 
-  
-* windows-msi: 
-* windows-exe: 
+  * toast, latest save time 제거 
+* windows-exe: http://10.90.180.72/HSS/xml-editor_view.two/-/wikis/uploads/07df179e871fc9dfbb6cd8c5cef4951f/xml-editor.zip
 
 ### release - 0.1.0 (alpha)
 * windows-msi: http://10.90.180.72/HSS/xml-editor_view.two/-/wikis/uploads/2e05c3afb8ab957e3622cdaf821be9bb/cljs-tauri_0.1.0_x64_en-US.msi
