@@ -1,7 +1,7 @@
 {
   "package": {
-    "productName": "cljs-tauri",
-    "version": "0.1.0"
+    "productName": "xml-editor",
+    "version": "0.2.0"
   },
   "build": {
     "distDir": "../dist",
@@ -60,7 +60,7 @@
             "writeFile": true
         },
         "notification": {
-            "all": true,
+            "all": true
         },
     },
     "windows": [{

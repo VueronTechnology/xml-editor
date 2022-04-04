@@ -8,8 +8,10 @@
             [taoensso.timbre :refer [debug info error fatal]]))
 
 (defn split-nm-v [group]
-  (into {} (map #(let [[_ nm v] (re-find #"\s*(\w+)\s*=\s*(-?\d+.?\d*)" %)]
-                   [nm (js/parseFloat v)]) group)))
+  (let [group-name (first group)
+        data (rest group)]
+  [group-name (into {} (map #(let [[_ nm v] (re-find #"\s*(\w+)\s*=\s*(-?\d+.?\d*)" %)]
+                   [nm (js/parseFloat v)]) data))]))
 
 (defn refine-cal-data [content]
   (let [refined (->> (s/split content #"\r\n\r\n")
@@ -17,22 +19,26 @@
                      (remove #(= 0 (count %))))]
     (let [d (for [group refined]
               (split-nm-v group))]
-      (dispatch [:xml-content (zipmap (iterate inc 1) d)]))))
+      (dispatch [:xml-content (into {} d)]))))
 
 (defn make-content-format-group [group-content]
   (reduce (fn [acc [nm v]]
             (str acc nm " = " v "\r\n")) "" group-content))
   
 (defn make-content-format [content]
-  (let [group-str (for [[_ group] content]
-                    (str (make-content-format-group group) "\r\n"))]
+  (let [group-str (for [[group-name items] content]
+                    (str group-name "\r\n" (make-content-format-group items) "\r\n"))]
     (apply str group-str)))
 
+(defn cur-time []
+  (let [date (new js/Date)]
+    (str (.getHours date) ":" (.getMinutes date) ":" (.getSeconds date))))
            
 (defn save-file [path content]
   (debug "save file" content)
   (-> (.writeFile fs (clj->js {:path path :contents (make-content-format content)}))
-      (.then #(funcs/toast "saved file"))
+      ;; (.then #(funcs/toast "saved file"))
+      (.then (dispatch [:latest-save-time (cur-time)]))
       (.catch #(prn "save-file errro: " %))))
 
 

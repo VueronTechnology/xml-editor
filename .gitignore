@@ -8,3 +8,8 @@ yarn.lock
 src-tauri/target
 yarn-error.log
 *.*#
+.clj-kondo
+.lsp/.cache
+src-tauri/WixTools
+*.bak
+.cpcache
