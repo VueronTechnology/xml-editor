@@ -189,7 +189,7 @@
         [:div {:key (gensym)
                :class "flex-intitial w-4 self-center h-4"}
          item-name])])
-   [:div {:class "flex overflow-auto"}
+   [:div {:class "flex overflow-auto gap-8"}
     (for [[group-name item] content]
       [:div {:class "flex flex-col "
              :key (gensym)}
@@ -219,17 +219,15 @@
       (if (empty? filename)
         "choose a xml file"
         (filter-file-name filename))]]))
-;;        (.pop (.split filename "/")))]]))
 
 (defn latest-save-time []
    (let [latest-save-time @(subscribe [:latest-save-time])]
      [:div {:class "flex"}
-      [:div 
-      (if (= latest-save-time 0)
+      [:div
+       (if (= latest-save-time 0)
         (str "")
         (str "latest save time: " latest-save-time))]]))
- 
-  
+
 (defn view-root []
   [:div {:class "flex flex-col w-auto "
          :key :main-div}
@@ -242,8 +240,6 @@
                                 :pauseOnFocusLoss false
                                 :draggable true
                                 :pauseOnHover true})]
-   [:div {:class "flex justify-center"}
-    (latest-save-time)]
    [:div {:class "flex flex-row justify-center items-center py-8 px-4 pa"}
     (open-file)
     (ui-slider)]
