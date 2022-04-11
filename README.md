@@ -4,6 +4,7 @@
 * node
 * rust
 
+
 ## build - relase
 * yarn postcss:release
 * yarn shadow:release
@@ -12,6 +13,14 @@
   * result
     * ./src-tauri/target/release/cljs-tauri.exe
     * ./src-tauri/target/release/bundle/msi/*.msi
+
+### release - 0.2.1
+* change note
+* calibration item 이름이 중복일 경우 처리하지 못하는 문제 
+  * item 이름을 원복, X,Y,Z,R,P,Y -> X,Y,Z,Roll,Pitch,Yaw]
+* window's title bar에 version 추가 
+
+* windows-exe: http://10.90.180.72/HSS/xml-editor_view.two/-/wikis/uploads/f0f0f8a143d9141a2b99f481044f17d8/xml-editor.zip
 
 ### release - 0.2.0
 * change note
