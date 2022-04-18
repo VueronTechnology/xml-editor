@@ -1,11 +1,12 @@
 # calibration.xml editor 
 
-## requirement
+## dev
+### requirement
 * node
 * rust
 
 
-## build - relase
+### build - relase
 * yarn postcss:release
 * yarn shadow:release
 * yarn tauri build
@@ -13,6 +14,11 @@
   * result
     * ./src-tauri/target/release/cljs-tauri.exe
     * ./src-tauri/target/release/bundle/msi/*.msi
+
+## launch
+### prequisite
+* link: https://developer.microsoft.com/en-us/microsoft-edge/webview2/#download-section
+* "Evergreen Standalone Installer"를 download. 
 
 ### release - 0.2.1
 * change note
