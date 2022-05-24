@@ -1,7 +1,7 @@
 {
   "package": {
     "productName": "xml-editor",
-    "version": "0.2.0"
+    "version": "0.2.1"
   },
   "build": {
     "distDir": "../dist",
@@ -61,10 +61,10 @@
         },
         "notification": {
             "all": true
-        },
+        }
     },
     "windows": [{
-        "title": "xml-editor",
+        "title": "xml-editor - 0.2.1",
         "width": 800,
         "height": 600,
         "resizable": true,
