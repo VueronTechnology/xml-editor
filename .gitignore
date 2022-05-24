@@ -1,4 +1,4 @@
-
+src-tauri/Cargo.lock
 node_modules/
 .shadow-cljs
 /dist/js/

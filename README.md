@@ -4,14 +4,18 @@
 * node
 * rust
 
-## build - relase
+## build - release
 * yarn postcss:release
 * yarn shadow:release
 * yarn tauri build
 
-  * result
+  * result 
     * ./src-tauri/target/release/cljs-tauri.exe
     * ./src-tauri/target/release/bundle/msi/*.msi
+
+### release - 0.2.1 
+* change note
+  * ...
 
 ### release - 0.2.0 (alpha)
 * change note
@@ -19,10 +23,5 @@
   * calibration 항목은 한번만 출력 
   * file path를 file명만 출력
   * 화면 축소시 가로 scroll bar 추가 
-  
-* windows-msi: 
-* windows-exe: 
 
 ### release - 0.1.0 (alpha)
-* windows-msi: http://10.90.180.72/HSS/xml-editor_view.two/-/wikis/uploads/2e05c3afb8ab957e3622cdaf821be9bb/cljs-tauri_0.1.0_x64_en-US.msi
-* windows-exe: http://10.90.180.72/HSS/xml-editor_view.two/-/wikis/uploads/f63d4f8d0364d71cb9d2a7bfd144c679/cljs-tauri.exe
