@@ -183,11 +183,10 @@
    (let [names (-> content first second keys)]
      [:div {:class "flex flex-col justify-center gap-8"}
       [:div {:key (gensym)
-             :class "flex-intitial w-4 self-center h-3 gap-2"}
-       ]
+             :class "flex-intitial w-6 self-center h-3 gap-2"}]
       (for [item-name names]
         [:div {:key (gensym)
-               :class "flex-intitial w-4 self-center h-4"}
+               :class "flex-intitial self-center h-4"}
          item-name])])
    [:div {:class "flex overflow-auto gap-8"}
     (for [[group-name item] content]

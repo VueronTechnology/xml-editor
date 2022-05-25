@@ -2,27 +2,31 @@ Sensor1
 X = 1.23
 Y = 245.3
 Z = 0.28
-R = 40.01
-P = 111.24
+Roll = 40.01
+Pitch = 111.24
+Yaw = 0.0
 
 Sensor2
 X = 0.23
 Y = -59.78
 Z = 0.02
-R = 40.01
-P = 0
+Roll = 40.01
+Pitch = 0
+Yaw = 0.0
 
 Sensor3
 X = -0.8
 Y = -59.7
 Z = 0.1
-R = 39.97
-P = -0.02
+Roll = 39.97
+Pitch = -0.02
+Yaw = 0.0
 
 Sensor4
 X = -0.8
 Y = -59.7
 Z = 0.1
-R = 40
-P = 0
+Roll = 40
+Pitch = 0
+Yaw = 0.0
 

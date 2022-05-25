@@ -10,7 +10,7 @@
 (defn split-nm-v [group]
   (let [group-name (first group)
         data (rest group)]
-  [group-name (into {} (map #(let [[_ nm v] (re-find #"\s*(\w+)\s*=\s*(-?\d+.?\d*)" %)]
+    [group-name (into {} (map #(let [[_ nm v] (re-find #"\s*(\w+)\s*=\s*(-?\d+.?\d*)" %)]
                    [nm (js/parseFloat v)]) data))]))
 
 (defn refine-cal-data [content]
@@ -24,7 +24,7 @@
 (defn make-content-format-group [group-content]
   (reduce (fn [acc [nm v]]
             (str acc nm " = " v "\r\n")) "" group-content))
-  
+
 (defn make-content-format [content]
   (let [group-str (for [[group-name items] content]
                     (str group-name "\r\n" (make-content-format-group items) "\r\n"))]
@@ -33,9 +33,8 @@
 (defn cur-time []
   (let [date (new js/Date)]
     (str (.getHours date) ":" (.getMinutes date) ":" (.getSeconds date))))
-           
+
 (defn save-file [path content]
-  (debug "save file" content)
   (-> (.writeFile fs (clj->js {:path path :contents (make-content-format content)}))
       ;; (.then #(funcs/toast "saved file"))
       (.then (dispatch [:latest-save-time (cur-time)]))
